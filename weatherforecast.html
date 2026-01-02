@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather Forecast</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      height: 100vh;
+
+      background-image: url("weather bg 2.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Dark overlay */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    /* Glass Card */
+    .weather-container {
+      position: relative;
+      z-index: 1;
+      width: 340px;
+      padding: 28px;
+      border-radius: 20px;
+
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        inset 0 0 1px rgba(255, 255, 255, 0.4);
+
+      color: #fff;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .weather-container:hover {
+      transform: translateY(-6px);
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      margin-bottom: 12px;
+
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+
+      background: linear-gradient(135deg, #6a89ff, #4a69bd);
+      color: white;
+
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .weather-result {
+      margin-top: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .weather-result h3 {
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .weather-result p {
+      margin: 4px 0;
+    }
+
+    .weather-result img {
+      margin-top: 10px;
+      width: 64px;
+      height: 64px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="weather-container">
+    <h1>🌤 Weather App</h1>
+
+    <input type="text" id="cityInput" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div id="weatherResult" class="weather-result"></div>
+  </div>
+
+  <script>
+  const apiKey = "019fb06810ef4419a11194423260201";
+
+  function getWeather() {
+    const city = document.getElementById("cityInput").value;
+
+    if (city === "") {
+      alert("Please enter a city name");
+      return;
+    }
+
+    const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("weatherResult").innerHTML = `
+          <h3>${data.location.name}, ${data.location.country}</h3>
+          <p>🌡 Temperature: <strong>${data.current.temp_c}°C</strong></p>
+          <p>☁ Condition: <strong>${data.current.condition.text}</strong></p>
+          <p>💨 Wind: <strong>${data.current.wind_kph} km/h</strong></p>
+          <p>💧 Humidity: <strong>${data.current.humidity}%</strong></p>
+          <img src="https:${data.current.condition.icon}" alt="Weather Icon">
+        `;
+      })
+      .catch(() => {
+        document.getElementById("weatherResult").innerHTML =
+          "<p>❌ City not found</p>";
+      });
+  }
+</script>
+
+
+</body>
+</html>

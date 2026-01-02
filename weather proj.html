@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weather App</title>
+
+<style>
+:root {
+  --accent: #6a89ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+
+  background: url("weather bg 2.jpg") center / cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+
+/* MAIN CARD */
+.weather-container {
+  position: relative;
+  z-index: 1;
+  width: 360px;
+  padding: 30px;
+  border-radius: 22px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  text-align: center;
+
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.4),
+    0 0 40px var(--accent);
+
+  animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+h1 {
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+
+  background: linear-gradient(135deg, #6a89ff, #38ada9);
+  box-shadow: 0 0 15px var(--accent);
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px var(--accent);
+}
+
+/* LOADING */
+.loader {
+  margin-top: 20px;
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-inline: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* WEATHER RESULT */
+.weather-result {
+  margin-top: 20px;
+  animation: fadeIn 0.8s ease;
+}
+
+.weather-result h3 {
+  margin-bottom: 6px;
+  font-size: 22px;
+}
+
+.weather-result p {
+  margin: 4px 0;
+}
+
+/* ICON */
+.weather-icon {
+  margin-top: 12px;
+  width: 90px;
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+</style>
+</head>
+
+<body>
+
+<div class="weather-container">
+  <h1>🌤 Weather App</h1>
+
+  <input id="cityInput" placeholder="Enter city name">
+  <button onclick="getWeather()">Get Weather</button>
+
+  <div id="weatherResult"></div>
+</div>
+
+<script>
+const apiKey = "019fb06810ef4419a11194423260201";
+
+function setTheme(condition) {
+  condition = condition.toLowerCase();
+
+  if (condition.includes("sun") || condition.includes("clear")) {
+    document.documentElement.style.setProperty("--accent", "#f6b93b");
+  } else if (condition.includes("rain") || condition.includes("storm")) {
+    document.documentElement.style.setProperty("--accent", "#4a69bd");
+  } else if (condition.includes("cloud")) {
+    document.documentElement.style.setProperty("--accent", "#82ccdd");
+  } else {
+    document.documentElement.style.setProperty("--accent", "#6a89ff");
+  }
+}
+
+function getWeather() {
+  const city = cityInput.value.trim();
+  if (!city) return alert("Enter a city name");
+
+  weatherResult.innerHTML = `<div class="loader"></div>`;
+
+  fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`)
+    .then(res => res.json())
+    .then(data => {
+      setTheme(data.current.condition.text);
+
+      weatherResult.innerHTML = `
+        <h3>${data.location.name}, ${data.location.country}</h3>
+        <p>🌡 <b>${data.current.temp_c}°C</b></p>
+        <p>☁ ${data.current.condition.text}</p>
+        <p>💨 ${data.current.wind_kph} km/h</p>
+        <p>💧 ${data.current.humidity}%</p>
+        <img class="weather-icon"
+             src="https:${data.current.condition.icon}">
+      `;
+    })
+    .catch(() => {
+      weatherResult.innerHTML = "<p>❌ City not found</p>";
+    });
+}
+</script>
+
+</body>
+</html>
